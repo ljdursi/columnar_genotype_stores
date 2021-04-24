@@ -22,7 +22,7 @@ dbsnp.vcf.gz:
 	curl -o $@.tbi ftp://ftp.ncbi.nlm.nih.gov/snp/organisms/human_9606_b151_GRCh37p13/VCF/00-All.vcf.gz.tbi
 
 $(TREEFILE):
-	stdpopsim HomSap -g HapMapII_GRCh37 -o $@ -d OutOfAfrica_2T12 3 3
+	stdpopsim HomSap -g HapMapII_GRCh37 -o $@ -d OutOfAfrica_2T12 3000 3000
 
 $(WGS_UNANNO): $(TREEFILE)
 	tskit vcf $(TREEFILE) -P 2 > $@
