@@ -1,0 +1,8 @@
+*~
+.*.swp
+*.gz
+*.tbi
+*.vcf
+*.ts
+vcfanno
+popsim

@@ -1,0 +1,5 @@
+[[annotation]]
+file="exons.bed.gz"
+columns = [4]
+names=["geneSymbol"]
+ops=["self"]
