@@ -19,6 +19,7 @@ import argparse
 import sqlite3
 import duckdb
 import pandas as pd
+import sqlalchemy.types as sqltypes
 import vcf
 import random
 
@@ -94,7 +95,7 @@ def tables(vcfFile, dataset):
         variant_table['chrom'].append(record.CHROM)
         variant_table['pos'].append(record.POS)
         variant_table['ref'].append(record.REF)
-        variant_table['alt'].append(record.ALT[0])
+        variant_table['alt'].append(str(record.ALT[0]))
         
         if record.INFO['geneSymbol']:
             annotations['vId'].append(vid)
@@ -117,47 +118,61 @@ def pd_to_sql(tables, con):
     """
     Create sql database from dataframes
     """
-    for tablename, table in tables:
-        table.to_sql(tablename, con, index=False)
+    for tablename, table in tables.items():
+        if not 'tablename' == 'variants':
+            table.to_sql(tablename, con, index=False)
+        else:
+            table.to_sql(tablename, con, index=False,
+                         dtypes = {
+                            'vId': sqltypes.INTEGER(),
+                            'chrom': sqltypes.VARCHAR(length=10),
+                            'pos': sqltypes.INTEGER(),
+                            'ref': sqltypes.VARCHAR(length=100),
+                            'alt': sqltypes.VARCHAR(length=100)
+                         })
 
 def pd_to_parquet(tables, prefix):
     """
     Create parquet tables from dataframes
     """
-    for tablename, table in tables:
+    for tablename, table in tables.items():
         table.to_parquet(f'{prefix}_{tablename}.parquet', index=False)
 
 def pd_to_csv(tables, prefix):
     """
     Create csv files from dataframes
     """
-    for tablename, table in tables:
+    for tablename, table in tables.items():
         table.to_csv(f'{prefix}_{tablename}.csv.gz', index=False)
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Convert multi-sample VCF to tables")
-    parser.add_argument("vcffile", type=argparse.FileType(mode='r'))
+    parser.add_argument("vcffile", type=argparse.FileType(mode='rb'))
     parser.add_argument("dataset_name", help="name of dataset for this vcf", default="dataset1", type=str)
     parser.add_argument("--sqlite", help="sqlite filename", type=str)
     parser.add_argument("--duckdb", help="duckdb filename", type=str)
     parser.add_argument("--parquet", help="parquet file prefix", type=str)
     parser.add_argument("--csv", help="csv file prefix", type=str)
     args = parser.parse_args()
-    print("Reading VCF and generating dataframes...")
 
+    print("Reading VCF and generating dataframes...")
     tables = tables(args.vcffile, args.dataset_name)
+
     if args.sqlite:
         print("Writing sqlite")
         with sqlite3.connect(args.sqlite) as con:
             pd_to_sql(tables, con)
+
     if args.duckdb:
         print("Writing duckdb")
-        with duckdb.connect(args.duckdb) as con:
-            pd_to_sql(tables, con)
+        con = duckdb.connect(args.duckdb, read_only=False)
+        pd_to_sql(tables, con)
+
     if args.csv:
         print("Writing csv")
         pd_to_csv(tables, args.csv)
+
     if args.parquet:
         print("Writing parquet")
         pd_to_parquet(tables, args.parquet)
