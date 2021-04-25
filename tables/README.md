@@ -21,5 +21,8 @@ TODOs:
 
 * dbs: Parquet to sqlite via pandas
 * dbs: Timing script - duckdb, duckdb/parquet, sqlite
-* genotypes as number instead of string: see how it affects file size, times
-* how easy is it to add columns in parquet or duckdb?  Maybe column families help?  Try w/o a separate annotations table
+* tables: genotypes as number instead of string: see how it affects file size, times
+* tables: how easy is it to add columns in parquet or duckdb?  Maybe column families help?  Try w/o a separate annotations table
+* dbs: Presto
+* dbs: Clickhouse
+* dbs: copy to duckdb in-memory?
