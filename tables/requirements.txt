@@ -1,5 +1,6 @@
 pandas
 pyarrow
 pyvcf
+cyvcf2
 duckdb
 sqlalchemy
