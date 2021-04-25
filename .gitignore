@@ -6,3 +6,6 @@
 *.ts
 vcfanno
 popsim
+*.sqlite
+*.duckdb
+*.parquet
