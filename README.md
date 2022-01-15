@@ -15,3 +15,13 @@ TODOs:
 * dbs: Clickhouse
 * tables: partition parquet files on vid?
 * tables: refactor variants-to-parquet tables out into a separate module
+
+Test:
+
+```mermaid
+graph TD;
+    A-->B;
+    A-->C;
+    B-->D;
+    C-->D;
+```
